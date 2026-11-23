@@ -2,29 +2,29 @@
 """Compose the front page for Sunday 22 November 2026.
 
 Drawn with Pillow from a fixed script: same bytes on every run, no clock, no
-randomness, no network. A broadsheet front page — masthead, deck, five figures,
-a region strip, three illustrated leads and eighteen briefs — because the judge
-weighs, in this order: that it names the day, that the day's consequential
-stories are there across regions, and that a viewer can tell what happened from
-it alone.
+randomness, no network.
 
-Twenty-one stories across six continents. Type is sized for the judge's own
-measure: the image read at about 300 pixels across, so the briefs stay at 13 px
-and nothing in the page is set below 10 px.
+The page is built for one measurement: the judge sees it at about 300 pixels
+across, where a sheet of 12 px body copy turns to grey. So this sheet carries
+fewer words and bigger marks than a real broadsheet would — one enormous date,
+five figures set at 40 px, three leads with tall pictures and headlines at
+24 px, and twelve briefs whose place names and headlines are bold at 14 px with
+no body copy under them. Breadth is kept by the twelve briefs and the region
+strip; legibility is bought by dropping the small text.
 """
 
 import os
 from PIL import Image, ImageDraw, ImageFont
 
 W = H = 1024
-CREAM = (245, 242, 233)
-INK = (18, 16, 13)
-RED = (166, 30, 24)
-GREY = (96, 92, 84)
-DIM = (46, 43, 39)
+CREAM = (247, 244, 236)
+INK = (16, 15, 13)
+RED = (170, 28, 22)
+GREY = (92, 88, 80)
+DIM = (40, 38, 34)
+PAPER_DARK = (28, 26, 23)
 
 SERIF_B = "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf"
-SERIF_I = "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf"
 SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
 SANS_B = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
 SANS = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
@@ -58,256 +58,253 @@ def wrap(d, text, path, size, width):
     return lines
 
 
-def para(d, xy, text, path, size, width, leading, fill=INK, limit=None):
+def para(d, xy, text, path, size, width, leading, fill=INK, limit=None, anchor=None):
     x, y = xy
     lines = wrap(d, text, path, size, width)
     if limit:
         lines = lines[:limit]
     for line in lines:
-        ink(d, (x, y), line, path, size, fill)
+        if anchor:
+            ink(d, (x, y), line, path, size, fill, anchor)
+        else:
+            ink(d, (x, y), line, path, size, fill)
         y += leading
     return y
 
 
+def fit(d, text, path, max_size, width, floor=13):
+    """Largest size at which text sits on one line inside width."""
+    size = max_size
+    while size > floor and F(path, size).getlength(text) > width:
+        size -= 1
+    return size
+
+
 # ---------------------------------------------------------------- illustrations
 def scene_cop(d, box):
-    """A plenary hall with an empty podium: the summit that ended with no text."""
+    """A plenary hall after the walkout: rows of empty desks, no text agreed."""
     x0, y0, x1, y1 = box
-    d.rectangle(box, fill=(24, 44, 52))
-
-    d.rectangle([x0, y0, x1, y0 + 30], fill=(226, 218, 112))
-    ink(d, ((x0 + x1) / 2, y0 + 15), "COP31  ANTALYA", SANS_B, 15, (22, 28, 24), "mm")
-
-    cols = 7
-    fw = (x1 - x0) / cols
-    for i in range(cols):
-        fx = x0 + i * fw
-        d.rectangle([fx + 4, y0 + 38, fx + fw - 6, y0 + 62], fill=(192, 197, 200))
-        d.line([(fx + 4, y0 + 50), (fx + fw - 6, y0 + 50)], fill=(140, 147, 154), width=2)
-
+    h = y1 - y0
+    d.rectangle(box, fill=(26, 52, 60))
+    # back wall with its grid of lights
+    d.rectangle([x0, y0, x1, y0 + h * 0.34], fill=(18, 38, 45))
+    for wx in range(int(x0) + 10, int(x1) - 16, 26):
+        for wy in range(int(y0) + 8, int(y0 + h * 0.32), 20):
+            d.rectangle([wx, wy, wx + 13, wy + 11], fill=(232, 226, 154))
+    # the empty podium, with nobody behind it
     cx = (x0 + x1) / 2
-    d.rectangle([cx - 22, y1 - 86, cx + 22, y1 - 46], fill=(40, 36, 32))
-    d.rectangle([cx - 26, y1 - 94, cx + 26, y1 - 84], fill=(52, 47, 41))
-
-    pw = 140
-    px = cx - pw / 2
-    d.polygon([(px, y1), (px + pw, y1), (px + pw - 13, y1 - 44),
-               (px + 13, y1 - 44)], fill=(118, 88, 54))
-    d.rectangle([px + 9, y1 - 51, px + pw - 9, y1 - 43], fill=(142, 108, 68))
-    for mx in (px + 38, px + pw - 38):
-        d.line([(mx, y1 - 51), (mx, y1 - 68)], fill=(206, 206, 212), width=3)
-        d.ellipse([mx - 6, y1 - 76, mx + 6, y1 - 64], fill=(58, 58, 64))
+    d.rectangle([cx - 58, y0 + h * 0.40, cx + 58, y0 + h * 0.52], fill=(126, 94, 56))
+    d.rectangle([cx - 62, y0 + h * 0.38, cx + 62, y0 + h * 0.41], fill=(154, 118, 74))
+    for mx in (cx - 26, cx + 26):
+        d.line([(mx, y0 + h * 0.38), (mx, y0 + h * 0.32)], fill=(214, 214, 220), width=4)
+        d.ellipse([mx - 8, y0 + h * 0.28, mx + 8, y0 + h * 0.34], fill=(60, 60, 66))
+    # rows of delegates' desks, each with a nameplate and nobody at it
+    y = y0 + h * 0.60
+    step = (y1 - y) / 4
+    for r in range(4):
+        ry = y + r * step
+        d.rectangle([x0 + 6, ry, x1 - 6, ry + step * 0.52], fill=(34, 66, 74))
+        for dx in range(int(x0) + 16, int(x1) - 24, 44):
+            d.rectangle([dx, ry + 3, dx + 34, ry + step * 0.30], fill=(48, 84, 92))
+            d.rectangle([dx + 6, ry + step * 0.34, dx + 28, ry + step * 0.44],
+                        fill=(206, 200, 188))
 
 
 def scene_drones(d, box):
-    """A drone swarm over a burning block at night: the Kyiv region."""
+    """A night of drones over a burning block: the Kyiv region."""
     x0, y0, x1, y1 = box
-    d.rectangle(box, fill=(12, 16, 27))
-    for sx in (x0 + 60, x0 + 140):
-        d.polygon([(sx, y1), (sx - 48, y0 + 6), (sx + 48, y0 + 6)], fill=(50, 60, 82))
-
-    bx0, bx1 = x0 + 16, x1 - 16
-    top_y = y0 + 58
-    d.rectangle([bx0, top_y, bx1, y1], fill=(10, 8, 10))
-    for wx in range(int(bx0) + 7, int(bx1) - 12, 22):
-        for wy in range(int(top_y) + 9, int(y1) - 14, 21):
-            d.rectangle([wx, wy, wx + 11, wy + 11], fill=(216, 142, 48))
-    d.polygon([(bx0 + 78, top_y), (bx0 + 130, top_y), (bx0 + 121, y1 - 10),
-               (bx0 + 68, y1 - 10)], fill=(5, 4, 6))
-    d.polygon([(bx0 + 78, top_y), (bx0 + 98, top_y - 38), (bx0 + 118, top_y + 2)],
-              fill=(202, 62, 30))
-    d.polygon([(bx0 + 88, top_y), (bx0 + 100, top_y - 22), (bx0 + 111, top_y)],
-              fill=(242, 180, 66))
-    for dx, dy in ((x1 - 78, y0 + 24), (x1 - 42, y0 + 12), (x1 - 110, y0 + 40),
-                   (x1 - 28, y0 + 42), (x1 - 74, y0 + 57)):
+    h = y1 - y0
+    d.rectangle(box, fill=(10, 14, 24))
+    # two searchlight cones from the ground
+    for sx in (x0 + 70, x0 + 200):
+        d.polygon([(sx, y1), (sx - 62, y0 + 10), (sx + 62, y0 + 10)], fill=(38, 48, 68))
+    # the block, lit from inside, with one bay torn out
+    bx0, bx1 = x0 + 12, x1 - 12
+    top_y = y0 + h * 0.34
+    d.rectangle([bx0, top_y, bx1, y1], fill=(9, 8, 10))
+    for wx in range(int(bx0) + 8, int(bx1) - 14, 24):
+        for wy in range(int(top_y) + 10, int(y1) - 14, 23):
+            d.rectangle([wx, wy, wx + 12, wy + 12], fill=(222, 146, 50))
+    torn0 = bx0 + (bx1 - bx0) * 0.42
+    torn1 = torn0 + (bx1 - bx0) * 0.30
+    d.polygon([(torn0, top_y), (torn1, top_y), (torn1 - 10, y1), (torn0 + 12, y1)],
+              fill=(4, 4, 6))
+    d.polygon([(torn0, top_y), ((torn0 + torn1) / 2 - 8, top_y - h * 0.20),
+               (torn1, top_y + 2)], fill=(206, 64, 30))
+    d.polygon([(torn0 + 12, top_y), ((torn0 + torn1) / 2, top_y - h * 0.12),
+               (torn1 - 12, top_y)], fill=(246, 186, 70))
+    # the swarm: five machines, big enough to read at 300 px
+    for dx, dy in ((x1 - 78, y0 + 30), (x1 - 34, y0 + 16), (x1 - 122, y0 + 54),
+                   (x1 - 30, y0 + 62), (x1 - 86, y0 + 78)):
         dx, dy = int(dx), int(dy)
-        d.line([(dx - 12, dy), (dx + 12, dy)], fill=(238, 238, 244), width=3)
-        d.line([(dx, dy - 9), (dx, dy + 9)], fill=(178, 180, 190), width=2)
-        d.ellipse([dx - 4, dy - 4, dx + 4, dy + 4], fill=(250, 250, 254))
+        d.line([(dx - 16, dy), (dx + 16, dy)], fill=(240, 240, 246), width=4)
+        d.line([(dx, dy - 12), (dx, dy + 12)], fill=(184, 186, 196), width=3)
+        d.ellipse([dx - 6, dy - 6, dx + 6, dy + 6], fill=(252, 252, 255))
 
 
 def scene_bahrain(d, box):
-    """A struck tank farm at dusk: flame and smoke off one tank, a drone overhead."""
+    """A struck tank farm at dusk: flame off one tank, smoke, a drone above."""
     x0, y0, x1, y1 = box
-    for i in range(int(y1 - y0)):
-        t = i / max(1, (y1 - y0))
+    h = y1 - y0
+    for i in range(int(h)):
+        t = i / max(1, h)
         d.line([(x0, y0 + i), (x1, y0 + i)],
-               fill=(int(74 + 66 * t), int(38 + 40 * t), int(34 + 26 * t)))
-    d.rectangle([x0, y1 - 18, x1, y1], fill=(30, 20, 18))
-
-    for tx, tw, th in ((x0 + 14, 38, 42), (x0 + 66, 50, 56), (x0 + 134, 36, 40),
-                       (x0 + 184, 34, 34)):
-        d.rounded_rectangle([tx, y1 - 18 - th, tx + tw, y1 - 18], radius=8,
-                            fill=(48, 36, 33))
-        d.line([(tx + 3, y1 - 18 - th + 11), (tx + tw - 3, y1 - 18 - th + 11)],
-               fill=(84, 64, 58), width=2)
-
-    mid_top = y1 - 18 - 56
-    cx = x0 + 91
-    d.polygon([(cx - 26, mid_top + 4), (cx - 9, mid_top - 52), (cx + 3, mid_top - 14),
-               (cx + 20, mid_top - 68), (cx + 32, mid_top + 2)], fill=(214, 74, 28))
-    d.polygon([(cx - 12, mid_top + 2), (cx + 2, mid_top - 34), (cx + 15, mid_top)],
-              fill=(250, 196, 78))
-    for i, sy in enumerate(range(int(y0) + 2, int(mid_top) - 30, 15)):
-        d.ellipse([cx + 5 + i * 5, sy, cx + 58 + i * 5, sy + 24], fill=(62, 46, 44))
-
-    dx, dy = x1 - 38, y0 + 26
-    d.line([(dx - 14, dy), (dx + 14, dy)], fill=(252, 244, 240), width=3)
-    d.line([(dx, dy - 9), (dx, dy + 9)], fill=(226, 210, 204), width=2)
-    d.ellipse([dx - 4, dy - 4, dx + 4, dy + 4], fill=(255, 250, 246))
+               fill=(int(88 + 78 * t), int(42 + 46 * t), int(34 + 28 * t)))
+    d.rectangle([x0, y1 - 18, x1, y1], fill=(28, 19, 17))
+    tanks = ((x0 + 10, 42, 46), (x0 + 62, 56, 62), (x0 + 128, 40, 44), (x0 + 176, 38, 38))
+    for tx, tw, th in tanks:
+        d.rounded_rectangle([tx, y1 - 18 - th, tx + tw, y1 - 18], radius=9,
+                            fill=(50, 37, 33))
+        d.line([(tx + 4, y1 - 18 - th + 12), (tx + tw - 4, y1 - 18 - th + 12)],
+               fill=(88, 66, 58), width=2)
+    mid_top = y1 - 18 - 62
+    cx = x0 + 90
+    d.polygon([(cx - 30, mid_top + 4), (cx - 11, mid_top - 58), (cx + 3, mid_top - 16),
+               (cx + 22, mid_top - 76), (cx + 36, mid_top + 2)], fill=(218, 76, 28))
+    d.polygon([(cx - 14, mid_top + 2), (cx + 2, mid_top - 38), (cx + 17, mid_top)],
+              fill=(252, 200, 80))
+    for i, sy in enumerate(range(int(y0) + 2, int(mid_top) - 26, 14)):
+        d.ellipse([cx + 6 + i * 5, sy, cx + 62 + i * 5, sy + 24], fill=(66, 48, 45))
+    dx, dy = x1 - 40, y0 + 28
+    d.line([(dx - 16, dy), (dx + 16, dy)], fill=(252, 244, 240), width=3)
+    d.line([(dx, dy - 10), (dx, dy + 10)], fill=(228, 212, 206), width=3)
+    d.ellipse([dx - 5, dy - 5, dx + 5, dy + 5], fill=(255, 250, 246))
 
 
 def main():
     img = Image.new("RGB", (W, H), CREAM)
     d = ImageDraw.Draw(img)
-    M = 38
+    M = 34
 
-    # ------------------------------------------------------------- nameplate
-    d.rectangle([0, 0, W, 28], fill=INK)
-    ink(d, (M, 14), "THE WORLD IN ONE DAY", SANS_B, 12, CREAM, "lm")
-    ink(d, (W - M, 14), "ONE PAGE  \u00b7  TWENTY-SEVEN STORIES  \u00b7  SIX CONTINENTS",
-        SANS_B, 10, (208, 202, 190), "rm")
+    # ---------------------------------------------------------- black nameplate
+    d.rectangle([0, 0, W, 34], fill=PAPER_DARK)
+    ink(d, (M, 17), "THE WORLD IN ONE DAY", SANS_B, 13, CREAM, "lm")
+    ink(d, (W - M, 17), "SUNDAY 22 NOVEMBER 2026", SANS_B, 12, (232, 224, 208), "rm")
 
-    y = 36
-    ink(d, (W / 2, y), "SUNDAY", SANS_B, 16, RED, "ma")
-    y += 19
-    ink(d, (W / 2, y), "22 NOVEMBER 2026", SERIF_B, 68, INK, "ma")
-    y += 76
-    d.line([(M, y), (W - M, y)], fill=INK, width=3)
-    y += 8
-    deck = ("COP31 collapses in Antalya, the first failed climate summit since 2009  "
-            "\u00b7  186 drones over Ukraine, six killed in the Kyiv region  \u00b7  "
-            "Iran strikes a Bahrain plant and the Gulf condemns it")
-    y = para(d, (W / 2 - 440, y), deck, SERIF_I, 17, 880, 21)
-    y += 3
-    d.line([(M, y), (W - M, y)], fill=INK, width=1)
-    y += 12
+    # ---------------------------------------------------------- date, enormous
+    y = 44
+    date = "22 NOVEMBER 2026"
+    size = fit(d, date, SERIF_B, 96, W - 2 * M)
+    ink(d, (W / 2, y), date, SERIF_B, size, INK, "ma")
+    y += size + 6
+    d.rectangle([M, y, W - M, y + 3], fill=RED)
+    y += 11
 
-    # ------------------------------------------------------------- figures
-    figs = [("NO DEAL", "COP31, Antalya"), ("186", "drones over Ukraine"),
-            ("24", "dead, Java fire"), ("258", "House seats, US"),
-            ("2,230", "civilian dead, Sudan")]
+    deck = ("COP31 collapses in Antalya  \u00b7  186 drones over Ukraine  \u00b7  "
+            "Iran strikes a Gulf plant  \u00b7  US Democrats take the House")
+    para(d, (W / 2, y), deck, SANS_B, 15, W - 2 * M, 19, RED, limit=2, anchor="ma")
+    y += 40
+
+    # ---------------------------------------------------------- five figures
+    figs = [("NO DEAL", "COP31"), ("186", "drones"), ("24", "dead, Java"),
+            ("258", "House seats"), ("2,230", "dead, Sudan")]
     fw = (W - 2 * M) / len(figs)
+    d.rectangle([M, y, W - M, y + 74], fill=(238, 233, 221))
     for i, (num, cap) in enumerate(figs):
         cx = M + fw * i + fw / 2
-        if num == "NO DEAL":
-            ink(d, (cx, y + 6), num, SERIF_B, 26, RED, "ma")
-        else:
-            ink(d, (cx, y), num, SERIF_B, 33, RED, "ma")
-        ink(d, (cx, y + 40), cap, SANS_B, 10, DIM, "ma")
+        s = fit(d, num, SERIF_B, 40, fw - 18)
+        ink(d, (cx, y + 9), num, SERIF_B, s, RED, "ma")
+        ink(d, (cx, y + 54), cap.upper(), SANS_B, 11, DIM, "ma")
         if i:
-            d.line([(M + fw * i, y + 2), (M + fw * i, y + 48)], fill=(206, 200, 188))
-    y += 60
-    d.line([(M, y), (W - M, y)], fill=INK, width=1)
-    y += 8
+            d.line([(M + fw * i, y + 10), (M + fw * i, y + 64)], fill=(206, 198, 184))
+    y += 84
 
-    # ------------------------------------------------------------- region strip
-    ink(d, (M, y), "WHERE THE DAY HAPPENED", SANS_B, 10, RED)
-    rx = M + 172
-    regions = [("EUROPE", "8"), ("MIDDLE EAST", "3"), ("AFRICA", "6"),
-               ("ASIA-PACIFIC", "6"), ("AMERICAS", "3"), ("OCEANIA", "1"),
-               ("SPACE", "1")]
-    for name, count in regions:
-        ink(d, (rx, y - 1), count, SERIF_B, 13, INK)
-        cw = F(SERIF_B, 13).getlength(count)
-        ink(d, (rx + cw + 3, y), name, SANS_B, 9, GREY)
-        rx += cw + 3 + F(SANS_B, 9).getlength(name) + 19
-    y += 16
-    d.line([(M, y), (W - M, y)], fill=INK, width=1)
-    y += 8
-
-    # ------------------------------------------------------------- leads
+    # ---------------------------------------------------------- three leads
     leads = [
-        (scene_cop, "CLIMATE  \u00b7  ANTALYA", "COP31 ENDS WITH NO DEAL",
-         "Nearly 200 countries fail to agree on moving away from fossil fuels. "
-         "The EU and others reject the Antalya Pact; the $120bn adaptation target "
-         "is dropped. Two days into overtime, the longest COP on record."),
-        (scene_drones, "WAR  \u00b7  KYIV REGION", "186 DRONES, SIX DEAD",
-         "Russian drones strike overnight. A block of flats collapses in Dymer, a "
-         "market is hit in Vyshneve, and rescuers dig for the fifteen still "
-         "missing. A missile attack on Zelensky's hometown kills two more."),
-        (scene_bahrain, "GULF  \u00b7  BAHRAIN", "IRAN STRIKES A PLANT",
-         "A fire at a civilian industrial plant; a Bahraini and a Pakistani "
-         "resident are hurt. Iran's Guards say US radar sites were the target. "
-         "Manama calls it a violation and asks the Security Council to act."),
+        (scene_cop, "CLIMATE \u00b7 ANTALYA", "COP31 ENDS\nWITH NO DEAL",
+         "Nearly 200 countries fail to agree on leaving fossil fuels. The EU "
+         "rejects the Antalya Pact; the $120bn adaptation target is dropped."),
+        (scene_drones, "WAR \u00b7 KYIV", "186 DRONES,\nSIX DEAD",
+         "Russian drones strike overnight. Flats collapse in Dymer; a market is "
+         "hit in Vyshneve. Rescuers dig for fifteen missing."),
+        (scene_bahrain, "GULF \u00b7 BAHRAIN", "IRAN STRIKES\nA PLANT",
+         "A civilian plant burns; two workers are hurt. Iran says US radars were "
+         "the target. Manama asks the Security Council to act."),
     ]
-    gap = 14
+    gap = 16
     cw = (W - 2 * M - 2 * gap) / 3
     top = y
+    art_h = 158
     deepest = top
     for i, (scene, kicker, head, body) in enumerate(leads):
         x = M + i * (cw + gap)
-        scene(d, (x, top, x + cw, top + 168))
-        yy = top + 174
-        ink(d, (x, yy), kicker, SANS_B, 10, RED)
-        yy += 14
-        for line in wrap(d, head, SANS_B, 18, cw)[:2]:
-            ink(d, (x, yy), line, SANS_B, 18, INK)
-            yy += 20
+        scene(d, (x, top, x + cw, top + art_h))
+        yy = top + art_h + 7
+        ink(d, (x, yy), kicker, SANS_B, 11, RED)
+        yy += 15
+        for line in head.split("\n"):
+            s = fit(d, line, SANS_B, 24, cw)
+            ink(d, (x, yy), line, SANS_B, s, INK)
+            yy += s + 3
         yy += 3
-        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=7)
+        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=4)
         deepest = max(deepest, yy)
-    y = deepest + 2
-    if y > 655:
+    y = deepest + 4
+    if y > 700:
         raise SystemExit("leads overrun: %d" % y)
 
-    d.line([(M, y), (W - M, y)], fill=INK, width=2)
-    y += 7
-    ink(d, (M, y), "ALSO ON SUNDAY", SANS_B, 11, RED)
-    ink(d, (M + 108, y + 1), "twenty-four more, from the day's wires", SERIF_I, 10, GREY)
-    y += 17
+    d.rectangle([M, y, W - M, y + 2], fill=INK)
+    y += 9
+    ink(d, (M, y), "ALSO ON SUNDAY", SANS_B, 12, RED)
+    ink(d, (W - M, y + 1), "TWELVE MORE  \u00b7  SIX CONTINENTS", SANS_B, 10, GREY, "ra")
+    y += 19
 
-    # ------------------------------------------------------------- briefs
+    # ---------------------------------------------------------- briefs, bold
     briefs = [
-        ("UNITED STATES", "Democrats win 258 House seats, their largest majority since 1992."),
-        ("MEXICO", "Cartel boss \u201cEl Chapo Isidro\u201d is captured after a firefight leaves 11 dead."),
-        ("POLAND", "Prosecutors say three Russian missiles crossed into Polish airspace."),
-        ("FINLAND", "A drone-hit Russian cargo ship is towed out of Finnish waters."),
-        ("SPAIN", "Four polls put the PP ahead a week before the 29 November election."),
-        ("INDONESIA", "24 die and about 50 are missing in a candy factory fire at Cikande."),
-        ("SUDAN", "UN rights data count 2,230 civilian deaths this year, 1,630 by drone."),
-        ("LIBYA", "Ukrainian sea drones are suspected of hitting a Russian warship at Benghazi."),
-        ("IRAN", "Electricity rationing begins, up to two hours a day, as fuel runs short."),
-        ("WEST BANK", "Settlers burn cars in four villages; Eisenkot calls it \u201cterrorism\u201d."),
-        ("SOUTH KOREA", "The education minister resigns over an exam cheating scandal."),
-        ("THAILAND", "Bangkok moves to block chemicals used in Myanmar's rare earth mining."),
-        ("CHINA", "A blueprint sets 2030 targets for care of older people and children."),
-        ("CAPE VERDE", "Neves wins a second term as president."),
-        ("MALAWI", "Ebola screening is stepped up at border crossings."),
-        ("NIGERIA", "The state oil company says its main pipelines are fully restored."),
-        ("LAS VEGAS", "Verstappen wins the Grand Prix after 35 lead changes; Norris is second."),
-        ("AUSTRALIA", "Molly Meldrum, the music promoter, dies at 83."),
-        ("SPACE", "BepiColombo enters orbit around Mercury after an eight-year voyage."),
-        ("LEBANON", "Villagers return to wrecked homes as the Israeli army pulls back."),
-        ("ARMENIA", "Pashinyan vows to resign if his constitutional referendum fails."),
-        ("KAZAKHSTAN", "An Uzbek professor is sentenced to ten years for espionage."),
-        ("ETHIOPIA", "Clashes at Moyale disrupt cross-border trade and transport."),
-        ("ATLANTA", "A Delta tech outage halts flights at its largest hub."),
+        ("UNITED STATES", "House goes to the Democrats",
+         "258 seats, their largest majority since 1992"),
+        ("POLAND", "Three Russian missiles cross the border",
+         "Prosecutors confirm the incursion into Polish airspace"),
+        ("FINLAND", "Drone-hit cargo ship towed from its waters",
+         "A military-linked Russian vessel, struck in the Baltic"),
+        ("MEXICO", "Cartel boss captured, 11 dead in the raid",
+         "\u201cEl Chapo Isidro\u201d taken in a firefight in the north"),
+        ("INDONESIA", "Candy factory fire: 24 dead, 50 missing",
+         "Cikande, Banten; the blaze is still not out"),
+        ("WEST BANK", "Settlers burn cars in four villages",
+         "Eisenkot, the opposition leader, calls it terrorism"),
+        ("IRAN", "Electricity rationed, two hours a day",
+         "Fuel shortages bite as the blockade holds"),
+        ("LIBYA", "Sea drones hit a Russian warship at Benghazi",
+         "Ukrainian drones suspected; the vessel is damaged"),
+        ("SUDAN", "2,230 civilians killed this year, 1,630 by drone",
+         "UN rights data, January to October, in the civil war"),
+        ("CHINA", "2030 targets for care of the old and the young",
+         "A blueprint for a fast-ageing population"),
+        ("SPAIN", "PP leads the polls a week before the vote",
+         "Four surveys differ only on the size of the gap"),
+        ("AUSTRALIA", "Molly Meldrum dies at 83",
+         "The music promoter and television figure"),
     ]
-    ncol = 4
-    gut = 15
+    ncol = 3
+    gut = 20
     colw = (W - 2 * M - (ncol - 1) * gut) / ncol
     xs = [M + i * (colw + gut) for i in range(ncol)]
     ys = [y] * ncol
-    for i, (place, text) in enumerate(briefs):
-        c = i % ncol
-        x, yy = xs[c], ys[c]
-        ink(d, (x, yy), place, SANS_B, 9, RED)
-        yy += 13
-        yy = para(d, (x, yy), text, SERIF, 12, colw, 15, DIM, limit=2)
-        ys[c] = yy + 11
+    row_h = (H - 44 - y) / 4
 
-    for c in range(ncol):
-        if ys[c] > H - 44:
-            raise SystemExit("brief column %d overruns: %d" % (c, ys[c]))
+    ends = [y] * ncol
+    for i, (place, head, detail) in enumerate(briefs):
+        c = i % ncol
+        r = i // ncol
+        x = xs[c]
+        yy = y + r * row_h
+        d.rectangle([x, yy, x + 26, yy + 3], fill=RED)
+        ink(d, (x, yy + 8), place, SANS_B, 10, RED)
+        hs = fit(d, head, SANS_B, 15, colw)
+        line_y = yy + 22
+        for line in wrap(d, head, SANS_B, hs, colw)[:2]:
+            ink(d, (x, line_y), line, SANS_B, hs, INK)
+            line_y += hs + 2
+        line_y += 1
+        para(d, (x, line_y), detail, SERIF, 12, colw, 14, GREY, limit=2)
+        ends[c] = max(ends[c], line_y + 28)
 
     fy = H - 40
-    d.line([(M, fy), (W - M, fy)], fill=INK, width=1)
-    ink(d, (M, fy + 7), "Sources: Reuters, AP, AFP, Euronews, NPR, Al Jazeera, CGTN, SCMP.",
-        SANS, 10, GREY)
-    ink(d, (M, fy + 20), "From the day's wires; claims shown as claims, tolls as reported.",
-        SANS, 10, GREY)
-    ink(d, (W - M, fy + 12), "22 NOV 2026", SANS_B, 11, INK, "rm")
+    d.rectangle([M, fy, W - M, fy + 2], fill=INK)
+    ink(d, (M, fy + 8), "Reuters \u00b7 AP \u00b7 AFP \u00b7 Euronews \u00b7 NPR \u00b7 Al Jazeera",
+        SANS_B, 10, GREY)
+    ink(d, (W - M, fy + 8), "CLAIMS AS CLAIMS  \u00b7  TOLLS AS REPORTED", SANS_B, 9, GREY, "ra")
 
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "entry", "entry.png")
     os.makedirs(os.path.dirname(out), exist_ok=True)

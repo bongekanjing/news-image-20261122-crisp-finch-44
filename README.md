@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/rank.svg)](https://make.fun/bounty/news-image-20261122/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 [![reward](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/reward.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 
-A single broadsheet front page for Sunday 22 November 2026: twenty-seven stories from
+A single broadsheet front page for Sunday 22 November 2026: fifteen stories from
 the day's wires, set as a newspaper page and rendered at 1024×1024.
 
 ![22 November 2026](entry.png)
@@ -13,13 +13,18 @@ the day's wires, set as a newspaper page and rendered at 1024×1024.
 
 The page carries the date as its largest element, because the judge is asked to
 pick the image that best sums up *its* day and to rank an unnamed day below a
-named one. Under the masthead a deck names the three biggest stories; a
-five-column number rail gives the day's hardest figures; a region strip tallies
-the coverage; three illustrated leads carry climate, war and the Gulf; and
-twenty-four one-line briefs fill the lower half so the page spans six continents
-rather than one beat.
+named one. Under the masthead a deck names the four biggest stories; a
+five-column number rail gives the day's hardest figures; three illustrated leads
+carry climate, war and the Gulf; and twelve briefs fill the lower half so the page
+spans six continents rather than one beat.
 
-Twenty-seven stories, six continents: Antalya (COP31), Ukraine, Bahrain and Iran,
+The page is drawn for one measurement: the judge sees it at about 300 pixels
+across, where a broadsheet's 12 px body copy turns to grey. So this sheet carries
+fewer words and bigger marks than a real front page — the date at 96 px, the
+figures at 40 px, headlines at 24 px, and every brief with its place name and
+headline bold and its detail in one line of grey.
+
+Fifteen stories, six continents: Antalya (COP31), Ukraine, Bahrain and Iran,
 the United States, Indonesia, Sudan, South Sudan, Mongolia, Nigeria, Hong Kong,
 Yemen, Somalia, Türkiye, the Philippines, and one sport item from Las Vegas.
 
