@@ -171,7 +171,6 @@ def scene_bahrain(d, box):
     d.ellipse([dx - 5, dy - 5, dx + 5, dy + 5], fill=(255, 250, 246))
 
 
-
 # ------------------------------------------------------------------- world map
 CONT = [
  [(-168,66),(-160,71),(-140,70),(-120,72),(-100,73),(-85,70),(-64,60),(-55,52),
@@ -251,6 +250,7 @@ def scene_map(d, box, pins):
         ink(d, (px, py), label, SANS_B, 9, (252, 250, 244), "mm")
 
 
+
 def main():
     img = Image.new("RGB", (W, H), CREAM)
     d = ImageDraw.Draw(img)
@@ -304,7 +304,7 @@ def main():
     gap = 16
     cw = (W - 2 * M - 2 * gap) / 3
     top = y
-    art_h = 128
+    art_h = 158
     deepest = top
     for i, (scene, kicker, head, body) in enumerate(leads):
         x = M + i * (cw + gap)
@@ -317,30 +317,29 @@ def main():
             ink(d, (x, yy), line, SANS_B, s, INK)
             yy += s + 3
         yy += 3
-        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=3)
+        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=4)
         deepest = max(deepest, yy)
     y = deepest + 4
-    if y > 620:
+    if y > 700:
         raise SystemExit("leads overrun: %d" % y)
 
     d.rectangle([M, y, W - M, y + 2], fill=INK)
-    y += 8
+    y += 7
 
-    # ------------------------------------------------------ where it happened
     ink(d, (M, y), "WHERE THE DAY HAPPENED", SANS_B, 11, RED)
     ink(d, (W - M, y + 1), "EVERY BRIEF PINNED", SANS_B, 9, GREY, "ra")
-    y += 16
-    map_h = 96
+    y += 15
+    map_h = 84
     pins = [
         (-77, 38, "1"), (19, 52, "2"), (25, 62, "3"), (-102, 24, "4"),
         (107, -6, "5"), (35, 32, "6"), (53, 32, "7"), (20, 32, "8"),
         (32, 16, "9"), (105, 35, "10"), (-4, 40, "11"), (134, -25, "12"),
     ]
     scene_map(d, (M, y, W - M, y + map_h), pins)
-    y += map_h + 8
+    y += map_h + 7
 
     d.rectangle([M, y, W - M, y + 2], fill=INK)
-    y += 8
+    y += 9
     ink(d, (M, y), "ALSO ON SUNDAY", SANS_B, 12, RED)
     ink(d, (W - M, y + 1), "TWELVE MORE  \u00b7  SIX CONTINENTS", SANS_B, 10, GREY, "ra")
     y += 17
@@ -385,16 +384,17 @@ def main():
         r = i // ncol
         x = xs[c]
         yy = y + r * row_h
-        d.ellipse([x, yy + 1, x + 15, yy + 16], fill=RED)
-        ink(d, (x + 7.5, yy + 8.5), str(i + 1), SANS_B, 9, CREAM, "mm")
-        ink(d, (x + 21, yy + 4), place, SANS_B, 10, RED)
-        hs = fit(d, head, SANS_B, 14, colw)
-        line_y = yy + 20
+        d.ellipse([x, yy + 1, x + 16, yy + 17], fill=RED)
+        ink(d, (x + 8, yy + 9), str(i + 1), SANS_B, 9, CREAM, "mm")
+        ink(d, (x + 22, yy + 5), place, SANS_B, 10, RED)
+        hs = fit(d, head, SANS_B, 15, colw)
+        line_y = yy + 21
         for line in wrap(d, head, SANS_B, hs, colw)[:2]:
             ink(d, (x, line_y), line, SANS_B, hs, INK)
-            line_y += hs + 1
-        para(d, (x, line_y), detail, SERIF, 11, colw, 13, GREY, limit=1)
-        ends[c] = max(ends[c], line_y + 24)
+            line_y += hs + 2
+        line_y += 1
+        para(d, (x, line_y), detail, SERIF, 12, colw, 14, GREY, limit=1)
+        ends[c] = max(ends[c], line_y + 22)
 
     fy = H - 40
     d.rectangle([M, fy, W - M, fy + 2], fill=INK)
