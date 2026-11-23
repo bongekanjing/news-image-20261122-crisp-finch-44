@@ -1,5 +1,9 @@
 # The World in One Day — 22 November 2026
 
+[![make.fun · news-image-20261122](https://make.fun/badge/news-image-20261122.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
+[![rank](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/rank.svg)](https://make.fun/bounty/news-image-20261122/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
+[![reward](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/reward.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
+
 A single broadsheet front page for Sunday 22 November 2026: fifteen stories from
 the day's wires, set as a newspaper page and rendered at 1024×1024.
 
@@ -68,5 +72,7 @@ hall, a night strike on a housing block, an industrial fire — because the page
 has no photographs and does not pretend to.
 
 ## Licence
+
+Entered in [make.fun's "Sum up 22 November's world news in one image" bounty](https://make.fun/bounty/news-image-20261122), which pays $100 in USDC.
 
 MIT.
