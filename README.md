@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/rank.svg)](https://make.fun/bounty/news-image-20261122/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 [![reward](https://make.fun/badge/news-image-20261122/bongekanjing/news-image-20261122-crisp-finch-44/reward.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 
-A single broadsheet front page for Sunday 22 November 2026: fifteen stories from
+A single broadsheet front page for Sunday 22 November 2026: twenty-seven stories from
 the day's wires, set as a newspaper page and rendered at 1024×1024.
 
 ![22 November 2026](entry.png)
@@ -14,11 +14,12 @@ the day's wires, set as a newspaper page and rendered at 1024×1024.
 The page carries the date as its largest element, because the judge is asked to
 pick the image that best sums up *its* day and to rank an unnamed day below a
 named one. Under the masthead a deck names the three biggest stories; a
-five-column number rail gives the day's hardest figures; three illustrated leads
-carry climate, war and the Gulf; twelve regional briefs fill the lower third so
-the page covers more than one beat.
+five-column number rail gives the day's hardest figures; a region strip tallies
+the coverage; three illustrated leads carry climate, war and the Gulf; and
+twenty-four one-line briefs fill the lower half so the page spans six continents
+rather than one beat.
 
-Fifteen stories, seven regions: Antalya (COP31), Ukraine, Bahrain and Iran,
+Twenty-seven stories, six continents: Antalya (COP31), Ukraine, Bahrain and Iran,
 the United States, Indonesia, Sudan, South Sudan, Mongolia, Nigeria, Hong Kong,
 Yemen, Somalia, Türkiye, the Philippines, and one sport item from Las Vegas.
 
@@ -29,13 +30,20 @@ Copenhagen in 2009; 186 Russian drones over Ukraine with six dead in the Kyiv
 region; an Iranian strike on a plant in Bahrain, condemned by Saudi Arabia, Qatar
 and the UAE.
 
-Briefs: Democrats take 258 House seats; a confectionery factory fire at Cikande
-kills 24; RSF drones hit Khartoum and Omdurman; 45 killed in a dawn raid in
-Warrap; Mongolia's parliament accepts the president's resignation; a funeral boat
-capsizes in Nigeria; a Hong Kong court bars twelve democrats from the polls;
-Houthis strike the Rabigh refinery; Verstappen wins in Las Vegas after 35 lead
-changes; the Antalya talks end two days into overtime; Mogadishu severs ties with
-the UAE; typhoon damage mounts in the northern Philippines.
+Briefs: Democrats take 258 House seats; a candy factory fire at Cikande kills 24
+with about 50 missing; UN rights data count 2,230 Sudanese civilian deaths this
+year, 1,630 of them by drone; cartel boss "El Chapo Isidro" is captured in
+Mexico; three Russian missiles cross into Polish airspace; a drone-hit Russian
+cargo ship is towed out of Finnish waters; Ukrainian sea drones are suspected of
+hitting a Russian warship at Benghazi; Iran begins rationing electricity; Israeli
+settlers burn cars in four West Bank villages; Bangkok moves to block chemicals
+for Myanmar's rare earth mines; China sets 2030 care targets; Neves wins a second
+term in Cape Verde; Malawi steps up Ebola screening; Nigeria's pipelines are
+restored; a Delta outage halts Atlanta; BepiColombo reaches Mercury; Lebanese
+villagers return as Israel pulls back; Pashinyan stakes his office on a
+referendum; an Uzbek professor gets ten years in Kazakhstan; clashes at Moyale;
+Spain's PP leads the polls; South Korea's education minister resigns; Verstappen
+wins in Las Vegas; Molly Meldrum dies at 83.
 
 Tolls are shown as reported, and the footer says so.
 
