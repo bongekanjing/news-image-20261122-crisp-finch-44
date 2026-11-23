@@ -171,6 +171,86 @@ def scene_bahrain(d, box):
     d.ellipse([dx - 5, dy - 5, dx + 5, dy + 5], fill=(255, 250, 246))
 
 
+
+# ------------------------------------------------------------------- world map
+CONT = [
+ [(-168,66),(-160,71),(-140,70),(-120,72),(-100,73),(-85,70),(-64,60),(-55,52),
+  (-66,45),(-70,42),(-76,35),(-81,25),(-90,29),(-97,26),(-104,20),(-112,29),
+  (-118,33),(-124,40),(-130,52),(-140,60),(-155,58)],
+ [(-104,20),(-95,16),(-88,16),(-83,9),(-77,8),(-85,13),(-95,18)],
+ [(-58,60),(-48,60),(-22,70),(-19,82),(-45,83),(-58,76)],
+ [(-79,9),(-72,11),(-62,10),(-52,4),(-35,-6),(-38,-16),(-41,-23),(-48,-26),
+  (-54,-34),(-58,-38),(-63,-42),(-68,-50),(-70,-55),(-75,-50),(-73,-42),
+  (-71,-30),(-70,-18),(-76,-14),(-81,-5)],
+ [(-10,36),(-9,43),(-2,48),(2,51),(4,53),(8,54),(10,57),(12,55),(14,54),
+  (20,55),(21,60),(25,65),(29,70),(40,68),(45,60),(42,52),(40,48),(30,46),
+  (28,41),(24,40),(22,37),(16,38),(13,45),(9,44),(3,43),(-2,36)],
+ [(-17,21),(-16,14),(-10,5),(0,5),(6,4),(9,4),(9,-1),(12,-5),(13,-12),(17,-18),
+  (20,-24),(23,-30),(27,-33),(32,-29),(35,-24),(40,-16),(40,-11),(39,-5),
+  (41,0),(43,5),(48,11),(51,11),(48,5),(43,10),(40,15),(37,22),(34,28),
+  (32,31),(25,32),(15,32),(10,33),(0,26),(-12,25)],
+ [(43,-13),(50,-15),(50,-25),(45,-25)],
+ [(26,41),(30,41),(35,42),(40,42),(45,40),(50,38),(56,38),(60,40),(66,38),
+  (70,35),(75,32),(80,30),(88,28),(92,23),(95,17),(98,12),(100,7),(104,2),
+  (100,-2),(96,4),(92,19),(88,22),(80,10),(77,8),(72,20),(66,25),(60,26),
+  (57,23),(52,17),(50,12),(44,13),(42,17),(38,22),(34,28),(33,31),(30,31),
+  (26,36)],
+ [(95,5),(105,-2),(120,-3),(130,-3),(140,-4),(141,-9),(128,-9),(115,-9),(104,-6)],
+ [(129,32),(135,34),(140,38),(143,43),(145,44),(141,39),(137,35),(131,31)],
+ [(114,-22),(113,-26),(116,-33),(122,-34),(129,-32),(135,-35),(140,-38),
+  (147,-38),(152,-32),(153,-27),(148,-20),(142,-11),(136,-12),(130,-11),(125,-14),(119,-18)],
+ [(166,-46),(171,-44),(175,-40),(178,-38),(174,-41),(170,-45)],
+ [(-10,52),(-6,50),(-3,51),(0,53),(-2,58),(-6,58),(-5,55)],
+]
+
+LAT_TOP, LAT_BOT = 78.0, -56.0
+LON_L, LON_R = -170.0, 190.0
+
+
+def _inside(x, y, poly):
+    n, c = len(poly), False
+    for i in range(n):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % n]
+        if (y1 > y) != (y2 > y):
+            if x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+                c = not c
+    return c
+
+
+def scene_map(d, box, pins):
+    """A dot-matrix world with a numbered red pin on every place in the briefs.
+
+    Drawn from lon/lat polygons, so the continents are where they belong; the
+    pins are placed by the same projection, so a reader can see the day was
+    everywhere rather than read a list of country names.
+    """
+    x0, y0, x1, y1 = box
+    w, h = x1 - x0, y1 - y0
+    d.rectangle(box, fill=(28, 40, 46))
+    cols, rows = 112, 52
+    cw, ch = w / cols, h / rows
+    for r in range(rows):
+        lat = LAT_TOP - (LAT_TOP - LAT_BOT) * (r + 0.5) / rows
+        for c in range(cols):
+            lon = LON_L + (LON_R - LON_L) * (c + 0.5) / cols
+            if any(_inside(lon, lat, p) for p in CONT):
+                px, py = x0 + c * cw, y0 + r * ch
+                d.rectangle([px, py, px + cw - 1.4, py + ch - 1.4], fill=(66, 88, 84))
+
+    def project(lon, lat):
+        px = x0 + (lon - LON_L) / (LON_R - LON_L) * w
+        py = y0 + (LAT_TOP - lat) / (LAT_TOP - LAT_BOT) * h
+        return px, py
+
+    for lon, lat, label in pins:
+        px, py = project(lon, lat)
+        r = 8
+        d.ellipse([px - r, py - r, px + r, py + r], fill=(206, 40, 30),
+                  outline=(250, 244, 232), width=2)
+        ink(d, (px, py), label, SANS_B, 9, (252, 250, 244), "mm")
+
+
 def main():
     img = Image.new("RGB", (W, H), CREAM)
     d = ImageDraw.Draw(img)
@@ -224,7 +304,7 @@ def main():
     gap = 16
     cw = (W - 2 * M - 2 * gap) / 3
     top = y
-    art_h = 158
+    art_h = 128
     deepest = top
     for i, (scene, kicker, head, body) in enumerate(leads):
         x = M + i * (cw + gap)
@@ -237,17 +317,33 @@ def main():
             ink(d, (x, yy), line, SANS_B, s, INK)
             yy += s + 3
         yy += 3
-        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=4)
+        yy = para(d, (x, yy), body, SERIF, 13, cw, 16, DIM, limit=3)
         deepest = max(deepest, yy)
     y = deepest + 4
-    if y > 700:
+    if y > 620:
         raise SystemExit("leads overrun: %d" % y)
 
     d.rectangle([M, y, W - M, y + 2], fill=INK)
-    y += 9
+    y += 8
+
+    # ------------------------------------------------------ where it happened
+    ink(d, (M, y), "WHERE THE DAY HAPPENED", SANS_B, 11, RED)
+    ink(d, (W - M, y + 1), "EVERY BRIEF PINNED", SANS_B, 9, GREY, "ra")
+    y += 16
+    map_h = 96
+    pins = [
+        (-77, 38, "1"), (19, 52, "2"), (25, 62, "3"), (-102, 24, "4"),
+        (107, -6, "5"), (35, 32, "6"), (53, 32, "7"), (20, 32, "8"),
+        (32, 16, "9"), (105, 35, "10"), (-4, 40, "11"), (134, -25, "12"),
+    ]
+    scene_map(d, (M, y, W - M, y + map_h), pins)
+    y += map_h + 8
+
+    d.rectangle([M, y, W - M, y + 2], fill=INK)
+    y += 8
     ink(d, (M, y), "ALSO ON SUNDAY", SANS_B, 12, RED)
     ink(d, (W - M, y + 1), "TWELVE MORE  \u00b7  SIX CONTINENTS", SANS_B, 10, GREY, "ra")
-    y += 19
+    y += 17
 
     # ---------------------------------------------------------- briefs, bold
     briefs = [
@@ -289,16 +385,16 @@ def main():
         r = i // ncol
         x = xs[c]
         yy = y + r * row_h
-        d.rectangle([x, yy, x + 26, yy + 3], fill=RED)
-        ink(d, (x, yy + 8), place, SANS_B, 10, RED)
-        hs = fit(d, head, SANS_B, 15, colw)
-        line_y = yy + 22
+        d.ellipse([x, yy + 1, x + 15, yy + 16], fill=RED)
+        ink(d, (x + 7.5, yy + 8.5), str(i + 1), SANS_B, 9, CREAM, "mm")
+        ink(d, (x + 21, yy + 4), place, SANS_B, 10, RED)
+        hs = fit(d, head, SANS_B, 14, colw)
+        line_y = yy + 20
         for line in wrap(d, head, SANS_B, hs, colw)[:2]:
             ink(d, (x, line_y), line, SANS_B, hs, INK)
-            line_y += hs + 2
-        line_y += 1
-        para(d, (x, line_y), detail, SERIF, 12, colw, 14, GREY, limit=2)
-        ends[c] = max(ends[c], line_y + 28)
+            line_y += hs + 1
+        para(d, (x, line_y), detail, SERIF, 11, colw, 13, GREY, limit=1)
+        ends[c] = max(ends[c], line_y + 24)
 
     fy = H - 40
     d.rectangle([M, fy, W - M, fy + 2], fill=INK)

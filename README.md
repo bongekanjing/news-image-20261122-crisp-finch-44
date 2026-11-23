@@ -13,10 +13,11 @@ the day's wires, set as a newspaper page and rendered at 1024×1024.
 
 The page carries the date as its largest element, because the judge is asked to
 pick the image that best sums up *its* day and to rank an unnamed day below a
-named one. Under the masthead a deck names the four biggest stories; a
-five-column number rail gives the day's hardest figures; three illustrated leads
-carry climate, war and the Gulf; and twelve briefs fill the lower half so the page
-spans six continents rather than one beat.
+named one. Under the masthead a deck names the four biggest stories; a five-column number
+rail gives the day's hardest figures; three illustrated leads carry climate, war
+and the Gulf; a dot-matrix world map pins every one of the twelve briefs to its
+place; and those briefs fill the lower half so the page spans six continents
+rather than one beat.
 
 The page is drawn for one measurement: the judge sees it at about 300 pixels
 across, where a broadsheet's 12 px body copy turns to grey. So this sheet carries
